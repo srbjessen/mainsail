@@ -160,11 +160,11 @@ export default class TheUpdateDialog extends Mixins(BaseMixin) {
     }
 
     async checkSocket() {
-        return axios.get(this.apiUrl+"/server/info")
-        .then((result) => { return result.status })
-        .catch((error) => {
-            return error?.response?.status ?? 0
-        })
+        return this.$httpClient.get("/server/info")
+            .then((result) => { return result.status })
+            .catch((error) => {
+                return error?.response?.status ?? 0
+            })
     }
 
     async login() {

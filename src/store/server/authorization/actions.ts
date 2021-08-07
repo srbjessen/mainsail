@@ -1,7 +1,8 @@
 import {ActionTree} from "vuex";
 import {ServerAuthorizationState} from "@/store/server/authorization/types";
 import {RootState} from "@/store/types";
-import axios from "axios";
+import axios, {AxiosError, AxiosResponse} from "axios";
+import Vue from "vue";
 
 export const actions: ActionTree<ServerAuthorizationState, RootState> = {
 	reset({ commit }) {
@@ -9,66 +10,57 @@ export const actions: ActionTree<ServerAuthorizationState, RootState> = {
 	},
 
 	async init({ commit, rootGetters, getters }) {
-		const apiUrl = rootGetters['socket/getUrl']
-
-
-		await axios.get(apiUrl+"/access/api_key")
-			.then((response) => {
+		await Vue.prototype.$httpClient.get("/access/api_key")
+			.then((response: AxiosResponse) => {
 				commit("updateApiKey", response.data?.result ?? "")
 			})
-			.catch((error) => {
+			.catch((error: AxiosError) => {
 				window.console.error(error)
 				commit("updateApiKey", "")
 			})
 
-		await axios.get(apiUrl+"/access/users/list")
-			.then((response) => {
+		await Vue.prototype.$httpClient.get("/access/users/list")
+			.then((response: AxiosResponse) => {
 				commit("initAvailableUsers", response.data?.result?.users ?? [])
 			})
-			.catch((error) => {
+			.catch((error: AxiosError) => {
 				window.console.error(error)
 				commit("initAvailableUsers", [])
 			})
 	},
 
 	refreshApiKey({ commit, rootGetters }) {
-		const apiUrl = rootGetters['socket/getUrl']
-
-		axios.post(apiUrl+"/access/api_key")
-			.then((response) => {
+		Vue.prototype.$httpClient.post("/access/api_key")
+			.then((response: AxiosResponse) => {
 				commit("updateApiKey", response.data?.result ?? "")
 			})
-			.catch((error) => {
+			.catch((error: AxiosError) => {
 				window.console.error(error)
 				commit("updateApiKey", "")
 			})
 	},
 
 	async storeUser({ rootGetters }, payload) {
-		const apiUrl = rootGetters['socket/getUrl']
-
-		return await axios.post(apiUrl+"/access/user", {
+		return await Vue.prototype.$httpClient.post("/access/user", {
 				username: payload.username,
 				password: payload.password,
 			})
-			.then((response) => {
+			.then((response: AxiosResponse) => {
 				return (response.status === 200)
 			})
-			.catch((error) => { window.console.error(error) })
+			.catch((error: AxiosError) => { window.console.error(error) })
 	},
 
 	async deleteUser({ rootGetters }, username) {
-		const apiUrl = rootGetters['socket/getUrl']
-
-		return axios.delete(apiUrl+"/access/user", {
+		return Vue.prototype.$httpClient.delete("/access/user", {
                 params: {
                     username
                 }
             })
-            .then((response) => {
+            .then((response: AxiosResponse) => {
 				return (response.status === 200)
 			})
-            .catch((error) => { window.console.error(error) })
+            .catch((error: AxiosError) => { window.console.error(error) })
 	},
 
 	notifyUserCreated({ commit }, payload) {

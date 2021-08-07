@@ -2,7 +2,7 @@ import Vue from 'vue'
 import {ActionTree} from "vuex"
 import {SocketState} from "@/store/socket/types"
 import {RootState} from "@/store/types";
-import axios from "axios";
+import axios, {AxiosError, AxiosResponse} from "axios";
 
 export const actions: ActionTree<SocketState, RootState> = {
 	reset({ commit }) {
@@ -16,29 +16,22 @@ export const actions: ActionTree<SocketState, RootState> = {
 	setSocket({ commit, state }, payload) {
 		commit('setData', payload)
 
-		if ('$socket' in Vue.prototype) {
-			Vue.prototype.$socket.close()
-			Vue.prototype.$socket.setUrl(state.protocol+"://"+payload.hostname+":"+payload.port+"/websocket")
-			Vue.prototype.$socket.connect()
+		if ('$socket' in Vue) {
+			Vue.$socket.close()
+			Vue.$socket.setUrl(state.protocol+"://"+payload.hostname+":"+payload.port+"/websocket")
+			Vue.$socket.connect()
 		}
 	},
 
 	async login({ commit, getters }, payload) {
-		const apiUrl = getters['getUrl']
-		await axios.post(apiUrl+"/access/login",{
+		await Vue.prototype.$httpClient.post("/access/login",{
 			username: payload.username,
 			password: payload.password
-		}, {
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		}).then(response => response.data.result)
-		.then(user => {
-			commit('setUser', user)
+		}).then((response: AxiosResponse) => {
+			commit('setUser', response.data.result)
 
-			return Promise.resolve(user)
-		}).catch(err => {
-
+			return Promise.resolve(response.data.result)
+		}).catch((err: AxiosError) => {
 			return Promise.reject(err)
 		})
 	},

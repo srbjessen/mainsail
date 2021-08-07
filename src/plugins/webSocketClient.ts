@@ -1,7 +1,6 @@
 import {Store} from "vuex"
 import _Vue from "vue";
 import {RootState} from "@/store/types";
-import Vue from "vue";
 
 export class WebSocketClient {
     url = ''
@@ -32,7 +31,6 @@ export class WebSocketClient {
     }
 
     connect(token: null | string = null): void {
-        window.console.log("start connecting")
         this.store?.dispatch("socket/setData", { isConnecting: true })
         this.instance = new WebSocket(token !== null ? this.url+"?token="+token : this.url)
 

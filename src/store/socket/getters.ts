@@ -11,4 +11,8 @@ export const getters: GetterTree<SocketState, RootState> = {
 	getWebsocketUrl: (state, getters) => {
 		return state.protocol + ":" + getters['getUrl'] + "/websocket"
 	},
+
+	getToken: (state) => {
+		return state.token !== null ? 'Bearer '+state.token : ''
+	}
 }

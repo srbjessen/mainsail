@@ -5,6 +5,8 @@ import i18n from '@/plugins/i18n'
 import './plugins/longpress'
 import store from '@/store'
 import router from '@/plugins/router'
+import {WebSocketPlugin} from "@/plugins/webSocketClient";
+import {HttpClientPlugin} from "@/plugins/httpClient";
 
 Vue.config.productionTip = false;
 
@@ -23,7 +25,6 @@ Vue.component('vue-load-image', VueLoadImage)
 //vue-toast-notification
 import VueToast from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
-import {WebSocketPlugin} from "@/plugins/webSocketClient";
 
 //vue2-perfect-scrollbar
 import PerfectScrollbar from 'vue2-perfect-scrollbar'
@@ -46,9 +47,16 @@ fetch('/config.json')
 .then(file => {
     store.commit('socket/setData', file)
 
-    const url = store.getters['socket/getWebsocketUrl']
+    const websocketUrl = store.getters['socket/getWebsocketUrl']
     Vue.use(WebSocketPlugin, {
+        url: websocketUrl,
+        store: store,
+    })
+
+    const url = store.getters['socket/getUrl']
+    Vue.use(HttpClientPlugin, {
         url: url,
+        timeout: 1000,
         store: store,
     })
 
