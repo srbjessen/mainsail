@@ -8,6 +8,7 @@ import { getters } from '@/store/server/getters'
 import { power } from '@/store/server/power'
 import { updateManager } from '@/store/server/updateManager'
 import { history } from '@/store/server/history'
+import { authorization } from '@/store/server/authorization'
 
 // create getDefaultState
 export const getDefaultState = (): ServerState => {
@@ -44,5 +45,6 @@ export const server: Module<ServerState, any> = {
 		power,
 		updateManager,
 		history,
+		authorization
 	}
 }

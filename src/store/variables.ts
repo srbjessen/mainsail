@@ -50,6 +50,7 @@ export const initableServerComponents = [
 	'history',
 	'power',
 	'updateManager',
+	'authorization',
 ]
 
 export const checkKlipperConfigModules = [

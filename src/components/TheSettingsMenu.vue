@@ -60,6 +60,7 @@ import SettingsPresetsTab from "@/components/settings/SettingsPresetsTab.vue";
 import SettingsRemotePrintersTab from "@/components/settings/SettingsRemotePrintersTab.vue";
 import SettingsThemeTab from "@/components/settings/SettingsThemeTab.vue";
 import SettingsDashboardTab from "@/components/settings/SettingsDashboardTab.vue";
+import SettingsAuthorizationTab from "@/components/settings/SettingsAuthorizationTab.vue";
 @Component({
     components: {
         SettingsThemeTab,
@@ -70,7 +71,8 @@ import SettingsDashboardTab from "@/components/settings/SettingsDashboardTab.vue
         SettingsMacrosTab,
         SettingsWebcamTab,
         SettingsGeneralTab,
-        SettingsDashboardTab
+        SettingsDashboardTab,
+        SettingsAuthorizationTab,
     }
 })
 export default class TheSettingsMenu extends Mixins(BaseMixin) {
@@ -87,6 +89,11 @@ export default class TheSettingsMenu extends Mixins(BaseMixin) {
                 icon: 'mdi-cog',
                 name: 'general',
                 title: this.$t('Settings.GeneralTab.General')
+            },
+            {
+                icon: 'mdi-account',
+                name: 'authorization',
+                title: this.$t('Settings.AuthorizationTab.Authorization')
             },
             {
                 icon: 'mdi-palette',

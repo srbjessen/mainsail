@@ -96,6 +96,14 @@ export const actions: ActionTree<SocketState, RootState> = {
 				dispatch('server/history/getChanged', payload.params[0], { root: true })
 				break
 
+			case 'notify_user_created':
+				dispatch('server/authorization/notifyUserCreated', payload.params[0], { root: true })
+				break
+
+			case 'notify_user_deleted':
+				dispatch('server/authorization/notifyUserDeleted', payload.params[0], { root: true })
+				break
+
 			default:
 				if (payload.result !== "ok" && payload.error?.message) window.console.error("JSON-RPC: " + payload.error.message)
 				else window.console.debug(payload)

@@ -474,6 +474,18 @@
 			"FactoryInfo": "Do you really want to reset mainsail to factory settings?",
 			"ResetMainsail": "reset mainsail"
 		},
+		"AuthorizationTab": {
+			"Authorization": "Authorization",
+			"ApiKey": "API-Key",
+			"CreateUser": "create account",
+			"CreateHeadline": "Create new account",
+			"EditHeadline": "Edit account",
+			"StoreButton": "store account",
+			"UpdateButton": "update account",
+			"Username": "Username",
+			"Password": "Password",
+			"ErrorSaving": "An unknown error has occurred."
+		},
 		"WebcamTab": {
 			"Webcams": "Webcams",
 			"ShowInNavigation": "Show in navigation",
