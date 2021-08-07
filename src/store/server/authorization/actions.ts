@@ -8,7 +8,7 @@ export const actions: ActionTree<ServerAuthorizationState, RootState> = {
 		commit('reset')
 	},
 
-	async init({ commit, rootGetters }) {
+	async init({ commit, rootGetters, getters }) {
 		const apiUrl = rootGetters['socket/getUrl']
 
 

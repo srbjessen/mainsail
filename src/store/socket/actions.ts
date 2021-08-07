@@ -2,6 +2,7 @@ import Vue from 'vue'
 import {ActionTree} from "vuex"
 import {SocketState} from "@/store/socket/types"
 import {RootState} from "@/store/types";
+import axios from "axios";
 
 export const actions: ActionTree<SocketState, RootState> = {
 	reset({ commit }) {
@@ -22,6 +23,40 @@ export const actions: ActionTree<SocketState, RootState> = {
 		}
 	},
 
+	async login({ commit, getters }, payload) {
+		const apiUrl = getters['getUrl']
+		await axios.post(apiUrl+"/access/login",{
+			username: payload.username,
+			password: payload.password
+		}, {
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		}).then(response => response.data.result)
+		.then(user => {
+			commit('setUser', user)
+
+			return Promise.resolve(user)
+		}).catch(err => {
+
+			return Promise.reject(err)
+		})
+	},
+
+	async getOneShotToken({ getters, state }) {
+		const apiUrl = getters['getUrl']
+		return await axios.get(apiUrl+"/access/oneshot_token",{
+				headers: {
+					Authorization: 'Bearer '+state.token
+				}
+			}).then(response => response.data.result)
+			.then(result => {
+				return Promise.resolve(result)
+			}).catch(error => {
+				window.console.error(error)
+			})
+	},
+
 	onOpen ({ commit, dispatch, rootState }) {
 		//set socket connection to connected
 		commit('setConnected')
@@ -39,6 +74,10 @@ export const actions: ActionTree<SocketState, RootState> = {
 		if (event.wasClean) {
 			window.console.log('Socket closed clear')
 		}
+	},
+
+	notReachable ({ commit }) {
+		commit('setDisconnected')
 	},
 
 	onMessage ({ commit, dispatch }, payload) {

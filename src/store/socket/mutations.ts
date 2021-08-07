@@ -27,6 +27,12 @@ export const mutations: MutationTree<SocketState> = {
 		})
 	},
 
+	setUser(state, user) {
+		Vue.set(state, 'username', user.username)
+		Vue.set(state, 'token', user.token)
+		Vue.set(state, 'refresh_token', user.refresh_token)
+	},
+
 	addLoading(state, payload) {
 		state.loadings.push(payload.name)
 	},

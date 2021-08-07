@@ -52,8 +52,6 @@ fetch('/config.json')
         store: store,
     })
 
-    if (!store?.state?.socket?.remoteMode) Vue.$socket.connect()
-
     new Vue({
       vuetify,
       router,

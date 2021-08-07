@@ -11,12 +11,62 @@
                         <v-icon class="mdi mdi-connection" left></v-icon>
                         <template v-if="connectingFailed">{{ $t("ConnectionDialog.Failed", {'host': formatHostname}) }}</template>
                         <template v-else-if="isConnecting">{{ $t("ConnectionDialog.Connecting", {'host': formatHostname}) }}</template>
+                        <template v-else-if="needLogin">{{ $t("ConnectionDialog.Login") }}</template>
                         <template v-else>{{ formatHostname }}</template>
                     </span>
                 </v-toolbar-title>
             </v-toolbar>
             <v-card-text class="pt-5" v-if="isConnecting">
                 <v-progress-linear color="white" indeterminate></v-progress-linear>
+            </v-card-text>
+            <v-card-text class="pt-5" v-else-if="needLogin">
+                <v-form v-model="form.valid" @submit.prevent="login">
+                    <v-row v-if="form.error">
+                        <v-col>
+                            <v-alert
+                                border="left"
+                                colored-border
+                                type="warning"
+                                elevation="2"
+                                class="mx-auto"
+                                max-width="500"
+                                icon="mdi-lock-outline"
+                            >{{ $t('ConnectionDialog.WrongLogin') }}</v-alert>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col>
+                            <v-text-field
+                                v-model="form.username"
+                                :label="$t('ConnectionDialog.Username')"
+                                autocomplete="username"
+                                hide-details
+                                outlined
+                                dense
+                                :disabled="form.loading"
+                            ></v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col>
+                            <v-text-field
+                                v-model="form.password"
+                                :label="$t('ConnectionDialog.Password')"
+                                autocomplete="current-password"
+                                type="password"
+                                outlined
+                                dense
+                                hide-details
+                                :disabled="form.loading"
+                            ></v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col class="text-center">
+                            <v-btn type="submit" color="primary" class="mx-auto" @loading="form.loading">{{ $t('ConnectionDialog.BtnLogin') }}</v-btn>
+                        </v-col>
+                    </v-row>
+                </v-form>
             </v-card-text>
             <v-card-text class="pt-5" v-if="!isConnecting && connectingFailed">
                 <connection-status :moonraker="false"></connection-status>
@@ -44,6 +94,7 @@ import Component from 'vue-class-component'
 import { Mixins } from 'vue-property-decorator'
 import BaseMixin from '@/components/mixins/base'
 import ConnectionStatus from "@/components/ui/ConnectionStatus.vue";
+import axios from "axios";
 
 @Component({
     components: {
@@ -51,7 +102,14 @@ import ConnectionStatus from "@/components/ui/ConnectionStatus.vue";
     }
 })
 export default class TheUpdateDialog extends Mixins(BaseMixin) {
-    counter = 0
+    private counter = 0
+    private form = {
+        valid: false,
+        loading: false,
+        error: false,
+        username: "",
+        password: ""
+    }
 
     get protocol() {
         return this.$store.state.socket.protocol
@@ -77,12 +135,57 @@ export default class TheUpdateDialog extends Mixins(BaseMixin) {
         return this.$store.state.socket.isConnecting
     }
 
+    get needLogin() {
+        return this.$store.state.socket.needLogin
+    }
+
     get connectingFailed() {
         return this.$store.state.socket.connectingFailed
     }
 
     get showDialog() {
         return !this.isConnected
+    }
+
+    async mounted() {
+        const statusCode = await this.checkSocket()
+        if (statusCode === 200) {
+            this.$socket.connect()
+        } else if (statusCode === 401) {
+            await this.$store.dispatch("socket/setData", { needLogin: true })
+        } else {
+            this.counter = 2
+            await this.$store.dispatch('socket/notReachable')
+        }
+    }
+
+    async checkSocket() {
+        return axios.get(this.apiUrl+"/server/info")
+        .then((result) => { return result.status })
+        .catch((error) => {
+            return error?.response?.status ?? 0
+        })
+    }
+
+    async login() {
+        this.form.error = false
+        this.form.loading = true
+
+        try {
+            await this.$store.dispatch("socket/login", {
+                username: this.form.username,
+                password: this.form.password
+            })
+        } catch(err) {
+            window.console.error(err)
+            this.form.error = true
+        }
+        this.form.loading = false
+
+        if (!this.form.error) {
+            const token = await this.$store.dispatch("socket/getOneShotToken")
+            this.$socket.connect(token)
+        }
     }
 
     reconnect() {

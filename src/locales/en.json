@@ -54,7 +54,12 @@
         "Failed": "Connection failed",
         "CannotConnectTo": "Cannot connect to Moonraker ({host}).",
         "TryAgain": "try again",
-        "CheckMoonrakerLog": "If this message appears repeatedly, please have a look in the log file located at:"
+        "CheckMoonrakerLog": "If this message appears repeatedly, please have a look in the log file located at:",
+		"Login": "Login",
+		"Username": "Username",
+		"Password": "Password",
+		"BtnLogin": "login",
+		"WrongLogin": "Wrong username or password"
     },
     "SelectPrinterDialog": {
         "Connecting": "Connecting to {host}",

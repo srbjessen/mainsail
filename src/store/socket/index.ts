@@ -14,7 +14,11 @@ export const getDefaultState = (): SocketState => {
 		reconnectInterval: process.env.VUE_APP_RECONNECT_INTERVAL || 2000,
 		isConnected: false,
 		isConnecting: false,
+		needLogin: false,
 		connectingFailed: false,
+		username: null,
+		token: null,
+		refresh_token: null,
 		loadings: []
 	}
 }
