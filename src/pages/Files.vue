@@ -354,7 +354,6 @@
 <script lang="ts">
 import {Component, Mixins, Watch} from "vue-property-decorator";
 import BaseMixin from "@/components/mixins/base";
-import axios from "axios";
 import { validGcodeExtensions } from "@/store/variables"
 import {findDirectory, formatFilesize, formatDate, sortFiles} from "@/plugins/helpers";
 import {FileStateFile} from "@/store/files/types";
@@ -670,8 +669,8 @@ export default class PageFiles extends Mixins(BaseMixin) {
         formData.append('file', file, (this.currentPath+"/"+filename).substring(7))
 
         return new Promise(resolve => {
-            this.uploadSnackbar.cancelTokenSource = axios.CancelToken.source();
-            axios.post(this.apiUrl + '/server/files/upload',
+            this.uploadSnackbar.cancelTokenSource = this.$httpClient.prototype.CancelToken.source();
+            this.$httpClient.post('/server/files/upload',
                 formData, {
                     cancelToken: this.uploadSnackbar.cancelTokenSource.token,
                     headers: { 'Content-Type': 'multipart/form-data' },

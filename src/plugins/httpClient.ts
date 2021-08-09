@@ -5,22 +5,22 @@ import axios from "axios";
 
 
 export function HttpClientPlugin<AxiosInstance>(Vue: typeof _Vue, options: HttpClientPluginOptions): void {
-    window.console.log("setup httpClientPlugin", options)
-
     const HttpClient = axios.create({
         baseURL: options.url,
         timeout: options.timeout,
         transformRequest: [function (data, headers) {
-            headers['Authorization'] = options.store.getters['socket/getToken']
+            const token = options.store.getters['socket/getToken']
+            if (token !== null) headers['Authorization'] = token
             // Do whatever you want to transform the data
 
-            return JSON.stringify(data);
-            //return data
+            if ('Content-Type' in headers && headers['Content-Type'] === 'application/json')
+                return JSON.stringify(data)
+
+            return data
         }],
-        headers: {
-            'Content-Type': 'application/json'
-        }
     })
+
+    HttpClient.prototype.CancelToken = axios.CancelToken
 
     Vue.prototype.$httpClient = HttpClient
     Vue.$httpClient = HttpClient

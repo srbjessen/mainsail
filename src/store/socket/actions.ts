@@ -24,9 +24,11 @@ export const actions: ActionTree<SocketState, RootState> = {
 	},
 
 	async login({ commit, getters }, payload) {
-		await Vue.prototype.$httpClient.post("/access/login",{
+		await Vue.$httpClient.post("/access/login", {
 			username: payload.username,
 			password: payload.password
+		}, {
+			headers: { 'Content-Type': 'application/json' },
 		}).then((response: AxiosResponse) => {
 			commit('setUser', response.data.result)
 

@@ -1,7 +1,7 @@
 import {ActionTree} from "vuex";
 import {ServerAuthorizationState} from "@/store/server/authorization/types";
 import {RootState} from "@/store/types";
-import axios, {AxiosError, AxiosResponse} from "axios";
+import {AxiosError, AxiosResponse} from "axios";
 import Vue from "vue";
 
 export const actions: ActionTree<ServerAuthorizationState, RootState> = {
@@ -10,7 +10,9 @@ export const actions: ActionTree<ServerAuthorizationState, RootState> = {
 	},
 
 	async init({ commit, rootGetters, getters }) {
-		await Vue.prototype.$httpClient.get("/access/api_key")
+		await Vue.$httpClient.get("/access/api_key", {
+				headers: { 'Content-Type': 'application/json' }
+			})
 			.then((response: AxiosResponse) => {
 				commit("updateApiKey", response.data?.result ?? "")
 			})
@@ -19,7 +21,9 @@ export const actions: ActionTree<ServerAuthorizationState, RootState> = {
 				commit("updateApiKey", "")
 			})
 
-		await Vue.prototype.$httpClient.get("/access/users/list")
+		await Vue.$httpClient.get("/access/users/list", {
+				headers: { 'Content-Type': 'application/json' }
+			})
 			.then((response: AxiosResponse) => {
 				commit("initAvailableUsers", response.data?.result?.users ?? [])
 			})
@@ -30,7 +34,9 @@ export const actions: ActionTree<ServerAuthorizationState, RootState> = {
 	},
 
 	refreshApiKey({ commit, rootGetters }) {
-		Vue.prototype.$httpClient.post("/access/api_key")
+		Vue.$httpClient.post("/access/api_key", {
+				headers: { 'Content-Type': 'application/json' }
+			})
 			.then((response: AxiosResponse) => {
 				commit("updateApiKey", response.data?.result ?? "")
 			})
@@ -41,9 +47,11 @@ export const actions: ActionTree<ServerAuthorizationState, RootState> = {
 	},
 
 	async storeUser({ rootGetters }, payload) {
-		return await Vue.prototype.$httpClient.post("/access/user", {
+		return await Vue.$httpClient.post("/access/user", {
 				username: payload.username,
 				password: payload.password,
+			}, {
+				headers: { 'Content-Type': 'application/json' }
 			})
 			.then((response: AxiosResponse) => {
 				return (response.status === 200)
@@ -52,7 +60,8 @@ export const actions: ActionTree<ServerAuthorizationState, RootState> = {
 	},
 
 	async deleteUser({ rootGetters }, username) {
-		return Vue.prototype.$httpClient.delete("/access/user", {
+		return Vue.$httpClient.delete("/access/user", {
+				headers: { 'Content-Type': 'application/json' },
                 params: {
                     username
                 }

@@ -13,6 +13,6 @@ export const getters: GetterTree<SocketState, RootState> = {
 	},
 
 	getToken: (state) => {
-		return state.token !== null ? 'Bearer '+state.token : ''
+		return state.token !== null ? 'Bearer '+state.token : null
 	}
 }
