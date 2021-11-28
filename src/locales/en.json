@@ -176,7 +176,7 @@
     "AllJobs": "All Jobs",
     "Empty": "Empty",
     "Delete": "Delete",
-    "Resume": "Resume",
+    "Start": "Start",
     "Pause": "Pause"
   },
   "Console": {
@@ -438,7 +438,8 @@
         "ExcludeObjectHeadline": "Exclude Object",
         "ExcludeObjectText": "Do you really want to exclude \"{name}\"?",
         "Cancel": "cancel"
-      }
+      },
+      "JobQueue": "Job Queue"
     },
     "ToolsPanel": {
       "Headline": "Temperatures",

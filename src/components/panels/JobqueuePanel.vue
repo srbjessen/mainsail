@@ -8,7 +8,7 @@
             <template v-slot:buttons>
                 <v-btn
                     color="success"
-                    @click="resumeJobqueue"
+                    @click="startJobqueue"
                     :loading="loadings.includes('resumeJobqueue')"
                     icon
                     tile
@@ -18,7 +18,7 @@
                         <template v-slot:activator="{ on, attrs }">
                             <v-icon v-bind="attrs" v-on="on">mdi-play</v-icon>
                         </template>
-                        <span>{{ $t('JobQueue.Resume') }}</span>
+                        <span>{{ $t('JobQueue.Start') }}</span>
                     </v-tooltip>
                 </v-btn>
                 <v-btn
@@ -107,16 +107,15 @@
 
 <script lang="ts">
 import {Component, Mixins} from 'vue-property-decorator'
-import BaseMixin from '@/components/mixins/base'
+import JobqueueMixin from '@/components/mixins/jobqueue'
 import {ServerHistoryStateJob} from '@/store/server/history/types'
-import {formatFilesize, formatPrintTime} from '@/plugins/helpers'
+import {formatFilesize} from '@/plugins/helpers'
 import Panel from '@/components/ui/Panel.vue'
 import {ServerJobQueueStateJob} from '@/store/server/jobQueue/types'
-import {thumbnailBigMin, thumbnailSmallMax, thumbnailSmallMin} from '@/store/variables'
 @Component({
     components: {Panel}
 })
-export default class JobqueuePanel extends Mixins(BaseMixin) {
+export default class JobqueuePanel extends Mixins(JobqueueMixin) {
     formatFilesize = formatFilesize
 
     private contextMenu = {
@@ -127,50 +126,12 @@ export default class JobqueuePanel extends Mixins(BaseMixin) {
         item: {}
     }
 
-    get jobs() {
-        return this.$store.getters['server/jobQueue/getJobs']
-    }
-
-    get queueState() {
-        return this.$store.state.server.jobQueue.queue_state ?? ''
-    }
-
     get countPerPage() {
         return this.$store.state.gui.jobqueue.countPerPage
     }
 
     set countPerPage(newVal) {
         this.$store.dispatch('gui/saveSetting', { name: 'jobqueue.countPerPage', value: newVal })
-    }
-
-    refreshHistory() {
-        this.$socket.emit('server.history.list', { start: 0, limit: 50 }, { action: 'server/history/getHistory' })
-    }
-
-    formatPrintTime(totalSeconds: number) {
-        if (totalSeconds) {
-            let output = ''
-
-            const days = Math.floor(totalSeconds / (3600 * 24))
-            if (days) {
-                totalSeconds %= (3600 * 24)
-                output += days+'d'
-            }
-
-            const hours = Math.floor(totalSeconds / 3600)
-            totalSeconds %= 3600
-            if (hours) output += ' '+hours+'h'
-
-            const minutes = Math.floor(totalSeconds / 60)
-            if (minutes) output += ' '+minutes+'m'
-
-            const seconds = totalSeconds % 60
-            if (seconds) output += ' '+seconds.toFixed(0)+'s'
-
-            return output
-        }
-
-        return '--'
     }
     
     showContextMenu (e: any, item: ServerHistoryStateJob) {
@@ -188,60 +149,6 @@ export default class JobqueuePanel extends Mixins(BaseMixin) {
 
     deleteJob(item: ServerJobQueueStateJob) {
         this.$store.dispatch('server/jobQueue/deleteFromQueue', [item.job_id])
-    }
-
-    resumeJobqueue() {
-        this.$store.dispatch('server/jobQueue/resume')
-    }
-
-    pauseJobqueue() {
-        this.$store.dispatch('server/jobQueue/pause')
-    }
-
-    getSmallThumbnail(item: ServerJobQueueStateJob) {
-        if (item?.metadata?.thumbnails?.length) {
-            const thumbnail = item?.metadata?.thumbnails.find((thumb: any) =>
-                thumb.width >= thumbnailSmallMin && thumb.width <= thumbnailSmallMax &&
-                thumb.height >= thumbnailSmallMin && thumb.height <= thumbnailSmallMax
-            )
-            const path = item.filename.lastIndexOf('/') !== -1 ? 'gcodes/'+item.filename.slice(0, item.filename.lastIndexOf('/')) : 'gcodes'
-
-            if (thumbnail && 'relative_path' in thumbnail) return this.apiUrl+'/server/files/'+path+'/'+encodeURIComponent(thumbnail.relative_path)+'?timestamp='+item.metadata?.modified.getTime()
-        }
-
-        return ''
-    }
-
-    getBigThumbnail(item: ServerJobQueueStateJob) {
-        if (item?.metadata?.thumbnails?.length) {
-            const thumbnail = item?.metadata?.thumbnails.find((thumb: any) => thumb.width >= thumbnailBigMin)
-            const path = item.filename.lastIndexOf('/') !== -1 ? 'gcodes/'+item.filename.slice(0, item.filename.lastIndexOf('/')) : 'gcodes'
-
-            if (thumbnail && 'relative_path' in thumbnail) return this.apiUrl+'/server/files/'+path+'/'+encodeURIComponent(thumbnail.relative_path)+'?timestamp='+item.metadata?.modified.getTime()
-        }
-
-        return ''
-    }
-
-    getDescription(item: ServerJobQueueStateJob) {
-        let output = ''
-
-        output += this.$t('Files.Filament')+': '
-        if (item.metadata?.filament_total || item.metadata.filament_weight_total) {
-            if (item.metadata?.filament_total) output += item.metadata.filament_total.toFixed()+' mm'
-            if (item.metadata?.filament_total && item.metadata.filament_weight_total) output += ' / '
-            if (item.metadata?.filament_weight_total) output += item.metadata.filament_weight_total.toFixed(2)+' g'
-        } else output += '--'
-
-        output += ', '+this.$t('Files.PrintTime')+': '
-        if (item.metadata?.estimated_time) output += formatPrintTime(item.metadata.estimated_time)
-        else output += '--'
-
-        return output
-    }
-
-    existMetadata(item: ServerJobQueueStateJob) {
-        return item?.metadata?.metadataPulled
     }
 }
 </script>

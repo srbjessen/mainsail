@@ -264,6 +264,7 @@
                         </v-row>
                     </v-container>
                 </template>
+                <status-panel-jobqueue></status-panel-jobqueue>
             </v-card-text>
         </panel>
     </div>
@@ -281,9 +282,11 @@ import KlippyStatePanel from '@/components/panels/KlippyStatePanel.vue'
 import KlipperWarningsPanel from '@/components/panels/KlipperWarningsPanel.vue'
 import StatusPanelExcludeObject from '@/components/panels/StatusPanelExcludeObject.vue'
 import Panel from '@/components/ui/Panel.vue'
+import StatusPanelJobqueue from '@/components/panels/StatusPanelJobqueue.vue'
 
 @Component({
     components: {
+        StatusPanelJobqueue,
         DependenciesPanel,
         KlipperWarningsPanel,
         KlippyStatePanel,
