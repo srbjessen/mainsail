@@ -30,8 +30,6 @@ export default class Webrtc extends Mixins(BaseMixin) {
     printerUrl: string | undefined
 
     get url() {
-        window.console.log(this.camSettings)
-
         return this.camSettings.urlStream || ''
     }
 
