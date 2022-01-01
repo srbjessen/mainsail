@@ -30,6 +30,8 @@ export default class Webrtc extends Mixins(BaseMixin) {
     printerUrl: string | undefined
 
     get url() {
+        window.console.log(this.camSettings)
+
         return this.camSettings.urlStream || ''
     }
 
@@ -38,7 +40,7 @@ export default class Webrtc extends Mixins(BaseMixin) {
     }
 
     mounted() {
-        this.player = new WebRtcPlayer(this.$refs.videoElement, this.url, 'Raspicam')
+        this.player = new WebRtcPlayer(this.$refs.videoElement, this.url, {})
     }
 
     beforeDestroy() {

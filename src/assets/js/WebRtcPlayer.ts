@@ -12,7 +12,7 @@
 export class WebRtcPlayer {
     private server = '127.0.0.1:8083'
     private video: HTMLVideoElement | null = null
-    private uuid: string = ''
+    private uuid = 'unicast'
     private options: any = {
         onStatusChange:null
     }
@@ -23,16 +23,18 @@ export class WebRtcPlayer {
     private webrtc: RTCPeerConnection | null = null
     private stream: MediaStream = new MediaStream()
 
-    constructor(videoElement: HTMLVideoElement, server: string, uuid: string, options={}) {
-        this.server = server
+    constructor(videoElement: HTMLVideoElement, server: string, options={}) {
         this.video = videoElement
-        this.uuid = uuid
+        this.createLinks(server)
         Object.assign(this.options, options)
-        this.createLinks()
         this.play()
     }
 
-    createLinks() {
+    createLinks(server: string) {
+        const serverSplits = server.split('/')
+        this.server = serverSplits[0] ?? '127.0.0.1:8083'
+        this.uuid = serverSplits[1] ?? 'unicast'
+
         this.codecLink = '//' + this.server + '/stream/codec/' + this.uuid
         this.rsdpLink = '//' + this.server + '/stream/receiver/' + this.uuid
     }
@@ -95,18 +97,17 @@ export class WebRtcPlayer {
         }
     }
 
-    load(uuid: string) {
-        this.destroy()
-        this.uuid = uuid
-        this.createLinks()
-        this.play()
-    }
-
     destroy() {
         this.webrtc?.close()
         this.webrtc = null
         if (this.video) this.video.srcObject = null
         this.stream = new MediaStream()
+    }
+
+    updateServer(server: string) {
+        this.destroy()
+        this.createLinks(server)
+        this.play()
     }
 
     getImageUrl() {
