@@ -57,9 +57,7 @@ export class WebRtcPlayer {
                     })
                 })
             })
-            .catch((error) => {
-                window.console.log(error)
-            })
+            .catch(() => {  })
 
         this.webrtc.onconnectionstatechange = () => {
             if(typeof this.options.onStatusChange == 'function'){
