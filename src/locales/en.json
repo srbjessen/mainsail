@@ -663,6 +663,7 @@
       "MjpegstreamerAdaptive": "Adaptive MJPEG-Streamer (experimental)",
       "Uv4lMjpeg": "UV4L-MJPEG",
       "Ipstream": "IP Camera",
+      "WebRTC": "WebRTC",
       "Required": "required",
       "NameAlreadyExists": "Name already exists",
       "Name": "Name",
