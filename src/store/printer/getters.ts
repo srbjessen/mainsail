@@ -2,7 +2,6 @@ import { checkKlipperConfigModules } from '@/store/variables'
 import { GetterTree } from 'vuex'
 import {
     PrinterState,
-    PrinterStateBedMesh,
     PrinterStateExtruder,
     PrinterStateExtruderStepper,
     PrinterStateFan,
@@ -290,7 +289,15 @@ export const getters: GetterTree<PrinterState, RootState> = {
 
     getMiscellaneous: (state) => {
         const output: PrinterStateMiscellaneous[] = []
-        const supportedObjects = ['controller_fan', 'heater_fan', 'fan_generic', 'fan', 'output_pin']
+        const supportedObjects = [
+            'controller_fan',
+            'heater_fan',
+            'fan_generic',
+            'fan',
+            'output_pin',
+            'pwm_tool',
+            'pwm_cycle_time',
+        ]
 
         const controllableFans = ['fan_generic', 'fan']
 
@@ -309,10 +316,11 @@ export const getters: GetterTree<PrinterState, RootState> = {
 
                     if (nameSplit[0].toLowerCase() === 'fan') scale = 255
 
-                    if (nameSplit[0].toLowerCase() === 'output_pin') {
+                    if (['output_pin', 'pwm_tool', 'pwm_cycle_time'].includes(nameSplit[0])) {
                         controllable = true
                         pwm = false
                         if ('pwm' in settings) pwm = settings?.pwm ?? false
+                        if (['pwm_tool', 'pwm_cycle_time'].includes(nameSplit[0])) pwm = true
                         if ('scale' in settings) scale = settings?.scale ?? 1
                     }
 
@@ -524,38 +532,6 @@ export const getters: GetterTree<PrinterState, RootState> = {
         })
 
         return output
-    },
-
-    getBedMeshProfiles: (state) => {
-        const profiles: PrinterStateBedMesh[] = []
-        let currentProfile = ''
-        if (state.bed_mesh) currentProfile = state.bed_mesh.profile_name
-
-        if (state.bed_mesh && 'profiles' in state.bed_mesh) {
-            Object.keys(state.bed_mesh?.profiles).forEach((key) => {
-                const value: any = state.bed_mesh.profiles[key]
-
-                let points: number[] = []
-                value.points.forEach((row: number[]) => {
-                    points = points.concat(row)
-                })
-
-                const min = Math.min(...points)
-                const max = Math.max(...points)
-
-                profiles.push({
-                    name: key,
-                    data: { ...value.mesh_params, points: value.points },
-                    points: points,
-                    min: min,
-                    max: max,
-                    variance: Math.abs(min - max),
-                    is_active: currentProfile === key,
-                })
-            })
-        }
-
-        return caseInsensitiveSort(profiles, 'name')
     },
 
     getExtruders: (state) => {

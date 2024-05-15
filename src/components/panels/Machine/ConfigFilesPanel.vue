@@ -601,10 +601,6 @@ interface uploadSnackbar {
     number: number
     max: number
     cancelTokenSource: any
-    lastProgress: {
-        time: number
-        loaded: number
-    }
 }
 
 interface draggingFile {
@@ -719,10 +715,6 @@ export default class ConfigFilesPanel extends Mixins(BaseMixin, ThemeMixin) {
         number: 0,
         max: 0,
         cancelTokenSource: {},
-        lastProgress: {
-            time: 0,
-            loaded: 0,
-        },
     }
     private draggingFile: draggingFile = {
         item: {
@@ -850,8 +842,15 @@ export default class ConfigFilesPanel extends Mixins(BaseMixin, ThemeMixin) {
         }
 
         if (this.hideBackupFiles) {
-            const backupFileMatcher = /.*\/?printer-\d{8}_\d{6}\.cfg$/
-            files = files.filter((file) => !file.filename.match(backupFileMatcher))
+            const klipperBackupFileMatcher = /^printer-\d{8}_\d{6}\.cfg$/
+            const crowsnestBackupFileMatcher = /^crowsnest\.conf\.\d{4}-\d{2}-\d{2}-\d{4}$/
+
+            files = files.filter(
+                (file) =>
+                    !file.filename.match(klipperBackupFileMatcher) &&
+                    !file.filename.match(crowsnestBackupFileMatcher) &&
+                    !file.filename.endsWith('.bkp')
+            )
         }
 
         return files

@@ -59,8 +59,10 @@
                 <v-container>
                     <v-row>
                         <v-col class="py-2">
-                            <span class="subtitle-2 d-block px-0 text--disabled">
-                                <v-icon class="mr-2" color="warning" small>{{ mdiAlertOutline }}</v-icon>
+                            <span class="subtitle-2 px-0 text--disabled">
+                                <v-icon class="mr-2 mt-1 float-left" color="warning" small>
+                                    {{ mdiAlertOutline }}
+                                </v-icon>
                                 {{ print_stats_message }}
                             </span>
                         </v-col>
@@ -70,10 +72,10 @@
             </template>
             <template v-if="display_message">
                 <v-container>
-                    <v-row>
-                        <v-col class="py-2">
-                            <span class="subtitle-2 d-block px-0 text--disabled">
-                                <v-icon class="mr-2" small>{{ mdiMessageProcessingOutline }}</v-icon>
+                    <v-row class="flex-nowrap">
+                        <v-col class="py-2" style="min-width: 0">
+                            <span class="subtitle-2 px-0 text--disabled">
+                                <v-icon class="mr-2 mt-1 float-left" small>{{ mdiMessageProcessingOutline }}</v-icon>
                                 {{ display_message }}
                             </span>
                         </v-col>
@@ -160,22 +162,22 @@ export default class StatusPanel extends Mixins(BaseMixin) {
     mdiDotsVertical = mdiDotsVertical
     mdiAlertOutline = mdiAlertOutline
 
-    private boolShowObjects = false
-    private boolShowPauseAtLayer = false
-
     declare $refs: {
         bigThumbnail: any
     }
 
-    private activeTab = 'files'
-    private lastFilename = ''
+    boolShowObjects = false
+    boolShowPauseAtLayer = false
+
+    activeTab = 'files'
+    lastFilename = ''
 
     get jobs() {
         return this.$store.getters['server/jobQueue/getJobs']
     }
 
     get jobsCount() {
-        return this.jobs.length ?? 0
+        return this.$store.getters['server/jobQueue/getJobsCount']
     }
 
     get jobQueueBadgeColor() {
